@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(multer().none());
 app.use(express.json());
 const ERROR_CODE = 400;
+const SERVER_ERROR_CODE = 500;
 const PORT_NUM = 8000;
 
 /**
@@ -34,33 +35,34 @@ async function getDBConnection() {
 app.get('/yipper/yips', async(req, res) => {
   try {
     let db = await getDBConnection();
-    let sql = req.query.search;
     let query;
-    if(sql) {
+    if(req.query.search) {
       query = `SELECT id FROM yips WHERE yip LIKE '%${req.query.search}%' ORDER BY id`;
     } else {
       query = `SELECT id, name, yip, hashtag, likes, date FROM yips ORDER BY DATETIME(date) DESC`;
     }
     let result = await db.all(query);
+    console.log(result);
     res.type('json').json(result);
   } catch (err) {
-    res.status(500).send('An error occurred on the server. Try again later.');
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
 app.get('/yipper/user/:user', async(req, res) => {
   try {
+    let user = req.params.user;
     let db = await getDBConnection();
-    let query = `SELECT name, yip, hashtag, date FROM yips WHERE name = ? ORDER BY DATETIME(date) DESC`;
-
+    let query = `SELECT name, yip, hashtag, date
+    FROM yips WHERE name = '${user}' ORDER BY DATETIME(date) DESC`;
     let result = await db.all(query);
     if (result.length == 0) {
-      res.status(404).send('User does not exist.');
+      res.status(ERROR_CODE).send('User does not exist.');
     } else {
       res.type('json').json(result);
     }
   } catch (err) {
-    res.status(500).send('An error occurred on the server. Try again later.');
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
@@ -71,18 +73,17 @@ app.post('/yipper/likes', async(req, res) => {
       ? `SELECT id FROM yips WHERE yip LIKE '%${req.query.search}%' ORDER BY id`
       : `SELECT id, name, yip, hashtag, likes, date FROM yips ORDER BY DATETIME(date) DESC`;
 
-    db.all = util.promisify(db.all);
     const rows = await db.all(sql, []);
     res.json({yips: rows});
   } catch (err) {
-    res.status(500).send('An error occurred on the server. Try again later.');
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
 app.post('/yipper/new', async(req, res) => {
   try {
     if (!req.body.name || !req.body.full) {
-      res.status(400).send('Missing one or more of the required params.');
+      res.status(ERROR_CODE).send('Missing one or more of the required params.');
       return;
     }
     let db = await getDBConnection();
@@ -96,7 +97,7 @@ app.post('/yipper/new', async(req, res) => {
     const row = await db.get(`SELECT * FROM yips WHERE id = ?`, db.lastID);
     res.json(row);
   } catch (err) {
-    res.status(500).send('An error occurred on the server. Try again later.');
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 

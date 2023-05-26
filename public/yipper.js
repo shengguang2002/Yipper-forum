@@ -28,12 +28,11 @@
     try {
       setError(false);
       showView('home');
-      const response = await fetch(`/yipper/yips?search=${id('search-term').value.trim()}`);
-      if (!response.ok) throw new Error(response.statusText);
-      const { ids } = await response.json();
-      const cards = id('home').querySelectorAll('.card');
+      let response = await fetch(`/yipper/yips?search=${id('search-term').value.trim()}`);
+      let { ids } = await response.json();
+      let cards = id('home').querySelectorAll('.card');
       for (const card of cards) {
-        card.classList.toggle('hidden', !ids.includes(card.id));
+        card.classList.add('hidden', !ids.includes(card.id));
       }
     } catch (err) {
       setError(true);
@@ -111,12 +110,14 @@
   async function loadYips() {
     try {
       setError(false);
-      let response = await fetch('/yipper/yips');
-      if (!response.ok) throw new Error(response.statusText);
-      const { yips } = await response.json();
       id('home').innerHTML = '';
-      for (const yip of yips) {
-        id('home').appendChild(createYipCard(yip));
+      let response = await fetch('/yipper/yips');
+      let yips = await response.json();
+      console.log(yips);
+      for (let i = 0; i < yips.length; i++) {
+        let yip = yips[i];
+        createYipCard(yip);
+        console.log("added");
       }
     } catch (err) {
       setError(true);
@@ -155,7 +156,6 @@
     const likesDiv = document.createElement('div');
     const heartImg = document.createElement('img');
     heartImg.src = 'img/heart.png';
-
     // Handle heart click
     heartImg.addEventListener('click', async () => {
       const response = await fetch('/yipper/likes', {
@@ -177,13 +177,15 @@
     metaDiv.appendChild(dateElement);
     metaDiv.appendChild(likesDiv);
     card.appendChild(metaDiv);
-    return card;
+    id('home').appendChild(card);
   }
 
   function setError(errorStatus) {
     if(errorStatus) {
+      console.log("true");
       id('error').classList.remove('hidden');
     } else {
+      console.log("false");
       id('error').classList.add('hidden');
     }
   }
