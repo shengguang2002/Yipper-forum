@@ -2,6 +2,10 @@
  *  Name: Hanyang Yu
  * Date: May 16, 2023
  * Section: CSE 154 AF
+ * This file is the server-side application for Yipper, a microblogging platform.
+ * It provides API endpoints for getting and posting yips, getting a specific user's yips,
+ * liking a yip, and creating a new yip. It uses Express.js for routing and SQLite for
+ * data storage.
  */
 
 'use strict';
@@ -35,6 +39,7 @@ async function getDBConnection() {
 }
 
 // GET endpoint for retrieving all yips or yips that match a search query
+// return 500 if server issue
 app.get('/yipper/yips', async(req, res) => {
   try {
     let db = await getDBConnection();
@@ -52,6 +57,7 @@ app.get('/yipper/yips', async(req, res) => {
 });
 
 // GET endpoint for retrieving yips from a specific user
+// return 500 if server issue
 app.get('/yipper/user/:user', async(req, res) => {
   try {
     let user = req.params.user;
@@ -70,6 +76,8 @@ app.get('/yipper/user/:user', async(req, res) => {
 });
 
 // POST endpoint for liking a yip
+// return 400 if missing parameter
+// return 500 if server issue
 app.post('/yipper/likes', async(req, res) => {
   try {
     if (!req.body.id) {
@@ -90,6 +98,8 @@ app.post('/yipper/likes', async(req, res) => {
 });
 
 // POST endpoint for creating a new yip
+// return 400 if missing parameter
+// return 500 if server issue
 app.post('/yipper/new', async(req, res) => {
   try {
     if (!req.body.name || !req.body.full) {
