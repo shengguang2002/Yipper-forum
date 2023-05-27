@@ -48,8 +48,8 @@ app.get('/yipper/yips', async(req, res) => {
     } else {
       query = `SELECT id, name, yip, hashtag, likes, date FROM yips ORDER BY DATETIME(date) DESC`;
     }
-    let result = await db.all(query);
-    res.type('json').json(result);
+    let row = await db.all(query);
+    res.type('json').json({"yips": row});
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }

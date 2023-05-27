@@ -152,10 +152,9 @@
       id('home').innerHTML = '';
       let response = await fetch('/yipper/yips');
       await statusCheck(response);
-      let yips = await response.json();
-      console.log(yips);
-      for (let i = 0; i < yips.length; i++) {
-        let yip = yips[i];
+      let yipsInfo = await response.json();
+      for (let i = 0; i < yipsInfo.yips.length; i++) {
+        let yip = yipsInfo.yips[i];
         let child = createYipCard(yip);
         id('home').appendChild(child);
       }
