@@ -90,7 +90,8 @@
       let response = await fetch('/yipper/new', {method: 'POST', body: newYip});
       await statusCheck(response);
       let yip = await response.json();
-      id('home').prepend(createYipCard(yip));
+      let child = await createYipCard(yip);
+      id('home').prepend(child);
       qs('#new form').querySelector('#name').value = '';
       qs('#new form').querySelector('#yip').value = '';
       setTimeout(() => showView('home'), 2000);
@@ -145,6 +146,7 @@
   async function loadYips() {
     try {
       setError(false);
+      showView('home');
       id('home').innerHTML = '';
       let response = await fetch('/yipper/yips');
       await statusCheck(response);
@@ -154,7 +156,6 @@
         let child = await createYipCard(yip);
         id('home').appendChild(child);
       }
-      response.log("finised");
     } catch (err) {
       setError(true);
     }
