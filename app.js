@@ -11,6 +11,8 @@ const fs = require("fs").promises;
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const app = express();
+
+// Middleware setup
 app.use(express.urlencoded({ extended: true }));
 app.use(multer().none());
 app.use(express.json());
@@ -32,6 +34,7 @@ async function getDBConnection() {
   return db;
 }
 
+// GET endpoint for retrieving all yips or yips that match a search query
 app.get('/yipper/yips', async(req, res) => {
   try {
     let db = await getDBConnection();
@@ -42,13 +45,13 @@ app.get('/yipper/yips', async(req, res) => {
       query = `SELECT id, name, yip, hashtag, likes, date FROM yips ORDER BY DATETIME(date) DESC`;
     }
     let result = await db.all(query);
-    console.log(result);
     res.type('json').json(result);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
+// GET endpoint for retrieving yips from a specific user
 app.get('/yipper/user/:user', async(req, res) => {
   try {
     let user = req.params.user;
@@ -66,20 +69,27 @@ app.get('/yipper/user/:user', async(req, res) => {
   }
 });
 
+// POST endpoint for liking a yip
 app.post('/yipper/likes', async(req, res) => {
   try {
+    if (!req.body.id) {
+      res.status(ERROR_CODE).send('Missing id.');
+      return;
+    }
+    let id = req.body.id;
     let db = await getDBConnection();
-    let sql = req.query.search
-      ? `SELECT id FROM yips WHERE yip LIKE '%${req.query.search}%' ORDER BY id`
-      : `SELECT id, name, yip, hashtag, likes, date FROM yips ORDER BY DATETIME(date) DESC`;
-
-    const rows = await db.all(sql, []);
-    res.json({yips: rows});
+    console.log("Before running SQL");
+    let sql = `UPDATE yips SET likes = likes + 1 WHERE id = ?`;
+    await db.run(sql, [id]);
+    let row = await db.get(`SELECT * FROM yips WHERE id = ?`, id);
+    res.type('text').send(String(row.likes));
+    console.log(row);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
+// POST endpoint for creating a new yip
 app.post('/yipper/new', async(req, res) => {
   try {
     if (!req.body.name || !req.body.full) {
@@ -89,18 +99,16 @@ app.post('/yipper/new', async(req, res) => {
     let db = await getDBConnection();
     let [yip, hashtag] = req.body.full.split(' #');
     let sql = `INSERT INTO yips (name, yip, hashtag, likes, date) VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`;
-
-    db.run = util.promisify(db.run);
-    await db.run(sql, [req.body.name, yip, hashtag]);
-
-    db.get = util.promisify(db.get);
-    const row = await db.get(`SELECT * FROM yips WHERE id = ?`, db.lastID);
-    res.json(row);
+    let results = await db.run(sql, [req.body.name, yip, hashtag]);
+    let id = results.lastID;
+    let row = await db.get(`SELECT * FROM yips WHERE id = ?`, id);
+    res.type('json').json(row);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
+// Serves static files from the public directory
 app.use(express.static('public'));
 const PORT = process.env.PORT || PORT_NUM;
 app.listen(PORT);

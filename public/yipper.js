@@ -24,21 +24,39 @@
     loadYips();
   }
 
+  /**
+   * Asynchronously handles the click event for the search button.
+   * Fetches Yips (posts) that match the entered search term and updates the view.
+   * Catches and handles any errors that occur during the fetch.
+   */
   async function searchBtnClicked() {
     try {
       setError(false);
       showView('home');
       let response = await fetch(`/yipper/yips?search=${id('search-term').value.trim()}`);
-      let { ids } = await response.json();
+      await statusCheck(response);
+      let rows = await response.json();
+      let ids = rows.map(row => row.id);
+      console.log(ids);
       let cards = id('home').querySelectorAll('.card');
-      for (const card of cards) {
-        card.classList.add('hidden', !ids.includes(card.id));
+      for (let card of cards) {
+        console.log(card);
+        if (!ids.includes(parseInt(card.id))) {
+          console.log(card.id);
+          card.classList.add('hidden');
+        } else {
+          card.classList.remove('hidden');
+        }
       }
     } catch (err) {
       setError(true);
     }
   }
 
+  /**
+   * Handles the click event for the home button.
+   * Clears the search term and makes all Yip cards visible.
+   */
   function homeBtnClicked() {
     setError(false);
     showView('home');
@@ -49,52 +67,65 @@
     }
   }
 
+  /**
+   * Handles the click event for the Yip button.
+   * Shows the new Yip form.
+   */
   function yipBtnClicked() {
     setError(false);
     showView('new');
   }
 
+  /**
+   * Asynchronously handles the submission event for the new Yip form.
+   * Sends a POST request with the new Yip data and updates the view.
+   * Catches and handles any errors that occur during the fetch.
+   */
   async function newFormSubmitted(event) {
     event.preventDefault();
     try {
       setError(false);
-      const nameInput = qs('#new form').querySelector('#name');
-      const yipInput = qs('#new form').querySelector('#yip');
-      const response = await fetch('/yipper/new', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: nameInput.value, full: yipInput.value }),
-      });
-      if (!response.ok) throw new Error(response.statusText);
-      const yip = await response.json();
+      let nameInput = qs('#new form').querySelector('#name').value;
+      let yipInput = qs('#new form').querySelector('#yip').value;
+      let newYip = new FormData();
+      newYip.append("name", nameInput);
+      newYip.append("full", yipInput);
+      let response = await fetch('/yipper/new', {method: 'POST', body: newYip});
+      await statusCheck(response);
+      let yip = await response.json();
       id('home').prepend(createYipCard(yip));
-      nameInput.value = '';
-      yipInput.value = '';
+      qs('#new form').querySelector('#name').value = '';
+      qs('#new form').querySelector('#yip').value = '';
+      console.log(yip);
       setTimeout(() => showView('home'), 2000);
+      console.log("response");
     } catch (err) {
       setError(true);
     }
   }
 
+  /**
+   * Asynchronously handles the click event in the home view.
+   * Fetches the clicked user's Yips and updates the view.
+   * Catches and handles any errors that occur during the fetch.
+   */
   async function homeViewClicked(event) {
     if (!event.target.classList.contains('individual')) return;
     try {
       setError(false);
       showView('user');
       id('user').innerHTML = '';
-      const response = await fetch(`/yipper/user/${event.target.textContent}`);
-      if (!response.ok) throw new Error(response.statusText);
-      const { name, yips } = await response.json();
-      const userArticle = document.createElement('article');
+      let response = await fetch(`/yipper/user/${event.target.textContent}`);
+      await statusCheck(response);
+      let rows = await response.json();
+      let userArticle = document.createElement('article');
       userArticle.classList.add('single');
-      const userHeader = document.createElement('h2');
-      userHeader.textContent = `Yips shared by ${name}:`;
+      let userHeader = document.createElement('h2');
+      userHeader.textContent = `Yips shared by ${rows[0].name}:`;
       userArticle.appendChild(userHeader);
-      for (let i = 0; i < yips.length; i++) {
-        const yipElement = document.createElement('p');
-        yipElement.textContent = `Yip ${i + 1}: ${yips[i].yip} #${yips[i].hashtag}`;
+      for (let i = 0; i < rows.length; i++) {
+        let yipElement = document.createElement('p');
+        yipElement.textContent = `Yip ${i + 1}: ${rows[i].yip} #${rows[i].hashtag}`;
         userArticle.appendChild(yipElement);
       }
       id('user').appendChild(userArticle);
@@ -103,51 +134,53 @@
     }
   }
 
+  /**
+   * Handles the input event for the search term input field.
+   * Enables or disables the search button depending on whether the input field is empty.
+   */
   function searchTermInput() {
     id('search-btn').disabled = !id('search-term').value.trim();
   }
 
+  /**
+   * Asynchronously loads all Yips from the server.
+   * Fetches all Yips and populates the home view with Yip cards.
+   * Catches and handles any errors that occur during the fetch.
+   */
   async function loadYips() {
     try {
       setError(false);
       id('home').innerHTML = '';
       let response = await fetch('/yipper/yips');
+      await statusCheck(response);
+      console.log(response);
       let yips = await response.json();
-      console.log(yips);
       for (let i = 0; i < yips.length; i++) {
         let yip = yips[i];
-        createYipCard(yip);
-        console.log("added");
+        console.log(yip);
+        let child = await createYipCard(yip);
+        console.log(child);
+        id('home').appendChild(child);
       }
+      response.log("finised");
     } catch (err) {
       setError(true);
     }
   }
 
-  // Other helper functions go here
-  // Such as showView, setError, createYipCard
-
   /**
-   * This function creates a Yip card element based on a given Yip object.
-   * @param {Object} yipInfo - the yip object that includes id, name, yip, hashtag, likes, and date
-   * @returns {HTMLElement} a DOM element that represents a Yip card.
+   * Asynchronously creates a Yip card element from a given Yip object.
+   * @param {Object} yipInfo - The yip object that includes id, name, yip, hashtag, likes, and date.
+   * @returns {HTMLElement} - A DOM element representing a Yip card.
    */
   async function createYipCard(yipInfo) {
-    console.log('card making');
     let card = document.createElement('article');
     card.id = yipInfo.id;
     card.classList.add('card');
     let userImage = document.createElement('img');
     userImage.src = `img/${yipInfo.name.toLowerCase().split(' ').join('-')}.png`;
     card.appendChild(userImage);
-    let yipDiv = document.createElement('div');
-    let individual = document.createElement('p');
-    individual.classList.add('individual');
-    individual.textContent = yipInfo.name;
-    let yipElement = document.createElement('p');
-    yipElement.textContent = `${yipInfo.yip} #${yipInfo.hashtag}`;
-    yipDiv.appendChild(individual);
-    yipDiv.appendChild(yipElement);
+    let yipDiv = addYipDiv(yipInfo);
     card.appendChild(yipDiv);
     const metaDiv = document.createElement('div');
     metaDiv.classList.add('meta');
@@ -156,33 +189,53 @@
     const likesDiv = document.createElement('div');
     const heartImg = document.createElement('img');
     heartImg.src = 'img/heart.png';
-    // Handle heart click
-    heartImg.addEventListener('click', async () => {
-      const response = await fetch('/yipper/likes', {
-        method: 'POST',
-        body: JSON.stringify(yipInfo),
-      });
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-      const { likes: newLikes } = await response.json();
-      likesElement.textContent = newLikes;
-    });
-
-    // Append likes info to card
-    const likesElement = document.createElement('p');
+    let likesElement = document.createElement('p');
     likesElement.textContent = yipInfo.likes;
     likesDiv.appendChild(heartImg);
     likesDiv.appendChild(likesElement);
     metaDiv.appendChild(dateElement);
     metaDiv.appendChild(likesDiv);
     card.appendChild(metaDiv);
-    id('home').appendChild(card);
+    heartImg.addEventListener('click', async () => {
+      let likedYip = new FormData();
+      likedYip.append("id", card.id);
+      console.log(card.id);
+      let response = await fetch('/yipper/likes', {method: 'POST', body: likedYip});
+      console.log(response);
+      await statusCheck(response);
+      let text = await response.text();
+      likesElement.textContent = text;
+    });
+    return card;
   }
 
+  /**
+   * Adds a div with the Yip's name and content to the Yip card.
+   * @param {Object} yipInfo - The Yip object that includes the Yip's name and content.
+   * @returns {HTMLElement} - A div element containing the Yip's name and content.
+   */
+  function addYipDiv(yipInfo) {
+    let yipDiv = document.createElement('div');
+    let individual = document.createElement('p');
+    individual.classList.add('individual');
+    individual.textContent = yipInfo.name;
+    let yipElement = document.createElement('p');
+    yipElement.textContent = `${yipInfo.yip} #${yipInfo.hashtag}`;
+    yipDiv.appendChild(individual);
+    yipDiv.appendChild(yipElement);
+    return yipDiv;
+  }
+
+  /**
+   * Updates the view based on the error status.
+   * @param {boolean} errorStatus - A boolean value indicating the error status.
+   */
   function setError(errorStatus) {
     if(errorStatus) {
       console.log("true");
+      id('home').classList.add('hidden');
+      id('user').classList.add('hidden');
+      id('new').classList.add('hidden');
       id('error').classList.remove('hidden');
     } else {
       console.log("false");
