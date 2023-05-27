@@ -163,7 +163,8 @@
 
   /**
    * Asynchronously creates a Yip card element from a given Yip object.
-   * @param {Object} yipInfo - The yip object that includes id, name, yip, hashtag, likes, and date.
+   * @param {Object} yipInfo - The yip object that includes id, name, yip, hashtag, likes,
+   * and date.
    * @returns {HTMLElement} - A DOM element representing a Yip card.
    */
   async function createYipCard(yipInfo) {

@@ -108,7 +108,8 @@ app.post('/yipper/new', async(req, res) => {
     }
     let db = await getDBConnection();
     let [yip, hashtag] = req.body.full.split(' #');
-    let sql = `INSERT INTO yips (name, yip, hashtag, likes, date) VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`;
+    let sql = `INSERT INTO yips (name, yip, hashtag, likes, date)
+    VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`;
     let results = await db.run(sql, [req.body.name, yip, hashtag]);
     let id = results.lastID;
     let row = await db.get(`SELECT * FROM yips WHERE id = ?`, id);
