@@ -18,7 +18,7 @@
     id('search-btn').addEventListener('click', searchBtnClicked);
     id('home-btn').addEventListener('click', homeBtnClicked);
     id('yip-btn').addEventListener('click', yipBtnClicked);
-    id('new').querySelector('form').addEventListener('submit', newFormSubmitted);
+    qs('#new form').addEventListener('submit', newFormSubmitted);
     id('home').addEventListener('click', homeViewClicked);
     id('search-term').addEventListener('input', searchTermInput);
     loadYips();
@@ -79,6 +79,7 @@
    * Catches and handles any errors that occur during the fetch.
    */
   async function newFormSubmitted(event) {
+    const WAIT_LENGTH = 2000;
     event.preventDefault();
     try {
       setError(false);
@@ -91,11 +92,11 @@
       await statusCheck(response);
       let yip = await response.json();
       console.log(yip);
-      let child = await createYipCard(yip);
+      let child = createYipCard(yip);
       id('home').prepend(child);
       qs('#new form').querySelector('#name').value = '';
       qs('#new form').querySelector('#yip').value = '';
-      setTimeout(() => showView('home'), 2000);
+      setTimeout(() => showView('home'), WAIT_LENGTH);
     } catch (err) {
       setError(true);
     }
@@ -155,7 +156,7 @@
       console.log(yips);
       for (let i = 0; i < yips.length; i++) {
         let yip = yips[i];
-        let child = await createYipCard(yip);
+        let child = createYipCard(yip);
         id('home').appendChild(child);
       }
     } catch (err) {
@@ -169,7 +170,7 @@
    * and date.
    * @returns {HTMLElement} - A DOM element representing a Yip card.
    */
-  async function createYipCard(yipInfo) {
+  function createYipCard(yipInfo) {
     let card = document.createElement('article');
     card.classList.add('card');
     card.id = yipInfo.id;
@@ -225,7 +226,7 @@
    * @param {boolean} errorStatus - A boolean value indicating the error status.
    */
   function setError(errorStatus) {
-    if(errorStatus) {
+    if (errorStatus) {
       id('home').classList.add('hidden');
       id('user').classList.add('hidden');
       id('new').classList.add('hidden');
@@ -255,7 +256,6 @@
     return document.getElementById(id);
   }
 
-
   /**
    * Checks the response status and throws an error if it's not OK.
    * @param {Response} res - The fetch response object
@@ -267,16 +267,6 @@
       throw new Error(await res.text());
     }
     return res;
-  }
-
-  /**
-   * A function that simplify calling document.querySelectorAll
-   * @param {selectors} query: A query of selector
-   * @returns {NodeList} An Element object representing the all elements in the document
-   * that matches the specified set of CSS selectors, or null is returned if there are no matches.
-   */
-  function qsa(query) {
-    return document.querySelectorAll(query);
   }
 
   /**
