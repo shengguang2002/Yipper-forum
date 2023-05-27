@@ -43,6 +43,7 @@ Possible 500 (server error) error
 
 
 **Example Request:**   http://localhost:8000/yipper/user/Alice
+
 **Example Response:**
 [
   {
