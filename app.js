@@ -44,7 +44,7 @@ async function getDBConnection() {
  * @param {string} req - Express request object.
  * @param {string} res - Express response object.
  */
-app.get('/yipper/yips', async(req, res) => {
+app.get('/yipper/yips', async (req, res) => {
   try {
     let db = await getDBConnection();
     let query;
@@ -67,7 +67,7 @@ app.get('/yipper/yips', async(req, res) => {
  * @param {string} req - Express request object.
  * @param {string} res - Express response object.
  */
-app.get('/yipper/user/:user', async(req, res) => {
+app.get('/yipper/user/:user', async (req, res) => {
   try {
     let user = req.params.user;
     let db = await getDBConnection();
@@ -84,7 +84,6 @@ app.get('/yipper/user/:user', async(req, res) => {
   }
 });
 
-
 /**
  * The app.post('/yipper/likes') is a POST Endpoint that allows a user to like a yip.
  * If the request is missing an id, it returns a 400 status code.
@@ -92,7 +91,7 @@ app.get('/yipper/user/:user', async(req, res) => {
  * @param {string} req - Express request object.
  * @param {string} res - Express response object.
  */
-app.post('/yipper/likes', async(req, res) => {
+app.post('/yipper/likes', async (req, res) => {
   try {
     if (!req.body.id) {
       res.status(ERROR_CODE).send('Missing id.');
@@ -116,7 +115,7 @@ app.post('/yipper/likes', async(req, res) => {
  * @param {string} req - Express request object.
  * @param {string} res - Express response object.
  */
-app.post('/yipper/new', async(req, res) => {
+app.post('/yipper/new', async (req, res) => {
   try {
     if (!req.body.name || !req.body.full) {
       res.status(ERROR_CODE).send('Missing one or more of the required params.');

@@ -76,7 +76,7 @@
     showView('new');
   }
 
-   /**
+  /**
    * Asynchronously handles the submission event for the new Yip form.
    * Sends a POST request with the new Yip data and updates the view.
    * Catches and handles any errors that occur during the fetch.
@@ -112,7 +112,7 @@
    * @param {Event} event - The form submission event
    */
   async function homeViewClicked(event) {
-    if (!event.target.classList.contains('individual')) {return};
+    if (!event.target.classList.contains('individual')) return;
     try {
       setError(false);
       showView('user');
@@ -188,7 +188,7 @@
     return card;
   }
 
-/**
+  /**
    * Adds meta data to a Yip card element.
    * @param {HTMLElement} card - The Yip card element to which meta data will be added.
    * @param {Object} yipInfo - The yip object that includes id, name, yip, hashtag, likes,
