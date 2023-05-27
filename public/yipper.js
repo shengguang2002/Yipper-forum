@@ -112,7 +112,9 @@
    * @param {Event} event - The form submission event
    */
   async function homeViewClicked(event) {
-    if (!event.target.classList.contains('individual')) return;
+    if (!event.target.classList.contains('individual')) {
+      return;
+    }
     try {
       setError(false);
       showView('user');
