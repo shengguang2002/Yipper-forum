@@ -37,12 +37,9 @@
       await statusCheck(response);
       let rows = await response.json();
       let ids = rows.map(row => row.id);
-      console.log(ids);
       let cards = id('home').querySelectorAll('.card');
       for (let card of cards) {
-        console.log(card);
         if (!ids.includes(parseInt(card.id))) {
-          console.log(card.id);
           card.classList.add('hidden');
         } else {
           card.classList.remove('hidden');
@@ -61,8 +58,8 @@
     setError(false);
     showView('home');
     id('search-term').value = '';
-    const cards = id('home').querySelectorAll('.card');
-    for (const card of cards) {
+    let cards = id('home').querySelectorAll('.card');
+    for (let card of cards) {
       card.classList.remove('hidden');
     }
   }
@@ -96,9 +93,7 @@
       id('home').prepend(createYipCard(yip));
       qs('#new form').querySelector('#name').value = '';
       qs('#new form').querySelector('#yip').value = '';
-      console.log(yip);
       setTimeout(() => showView('home'), 2000);
-      console.log("response");
     } catch (err) {
       setError(true);
     }
@@ -153,13 +148,10 @@
       id('home').innerHTML = '';
       let response = await fetch('/yipper/yips');
       await statusCheck(response);
-      console.log(response);
       let yips = await response.json();
       for (let i = 0; i < yips.length; i++) {
         let yip = yips[i];
-        console.log(yip);
         let child = await createYipCard(yip);
-        console.log(child);
         id('home').appendChild(child);
       }
       response.log("finised");
@@ -182,12 +174,12 @@
     card.appendChild(userImage);
     let yipDiv = addYipDiv(yipInfo);
     card.appendChild(yipDiv);
-    const metaDiv = document.createElement('div');
+    let metaDiv = document.createElement('div');
     metaDiv.classList.add('meta');
-    const dateElement = document.createElement('p');
+    let dateElement = document.createElement('p');
     dateElement.textContent = new Date(yipInfo.date).toLocaleString();
-    const likesDiv = document.createElement('div');
-    const heartImg = document.createElement('img');
+    let likesDiv = document.createElement('div');
+    let heartImg = document.createElement('img');
     heartImg.src = 'img/heart.png';
     let likesElement = document.createElement('p');
     likesElement.textContent = yipInfo.likes;
@@ -199,9 +191,7 @@
     heartImg.addEventListener('click', async () => {
       let likedYip = new FormData();
       likedYip.append("id", card.id);
-      console.log(card.id);
       let response = await fetch('/yipper/likes', {method: 'POST', body: likedYip});
-      console.log(response);
       await statusCheck(response);
       let text = await response.text();
       likesElement.textContent = text;
@@ -232,13 +222,11 @@
    */
   function setError(errorStatus) {
     if(errorStatus) {
-      console.log("true");
       id('home').classList.add('hidden');
       id('user').classList.add('hidden');
       id('new').classList.add('hidden');
       id('error').classList.remove('hidden');
     } else {
-      console.log("false");
       id('error').classList.add('hidden');
     }
   }
