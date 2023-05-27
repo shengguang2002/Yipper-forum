@@ -90,6 +90,7 @@
       let response = await fetch('/yipper/new', {method: 'POST', body: newYip});
       await statusCheck(response);
       let yip = await response.json();
+      console.log(yip);
       let child = await createYipCard(yip);
       id('home').prepend(child);
       qs('#new form').querySelector('#name').value = '';
@@ -151,6 +152,7 @@
       let response = await fetch('/yipper/yips');
       await statusCheck(response);
       let yips = await response.json();
+      console.log(yips);
       for (let i = 0; i < yips.length; i++) {
         let yip = yips[i];
         let child = await createYipCard(yip);
@@ -169,8 +171,8 @@
    */
   async function createYipCard(yipInfo) {
     let card = document.createElement('article');
-    card.id = yipInfo.id;
     card.classList.add('card');
+    card.id = yipInfo.id;
     let userImage = document.createElement('img');
     userImage.src = `img/${yipInfo.name.toLowerCase().split(' ').join('-')}.png`;
     card.appendChild(userImage);
