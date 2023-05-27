@@ -37,8 +37,13 @@ async function getDBConnection() {
   return db;
 }
 
-// GET endpoint for retrieving all yips or yips that match a search query
-// return 500 if server issue
+/**
+ * The app.get('/yipper/yips') is a GET Endpoint that retrieves all yips or yips
+ * that match a search query.
+ * If there's a server error, it returns a 500 status code.
+ * @param {string} req - Express request object.
+ * @param {string} res - Express response object.
+ */
 app.get('/yipper/yips', async(req, res) => {
   try {
     let db = await getDBConnection();
@@ -55,8 +60,13 @@ app.get('/yipper/yips', async(req, res) => {
   }
 });
 
-// GET endpoint for retrieving yips from a specific user
-// return 500 if server issue
+/**
+ * The app.get('/yipper/user/:user') is a GET Endpoint that retrieves yips from a specific user.
+ * If the user does not exist, it returns a 400 status code.
+ * If there's a server error, it returns a 500 status code.
+ * @param {string} req - Express request object.
+ * @param {string} res - Express response object.
+ */
 app.get('/yipper/user/:user', async(req, res) => {
   try {
     let user = req.params.user;
@@ -74,9 +84,14 @@ app.get('/yipper/user/:user', async(req, res) => {
   }
 });
 
-// POST endpoint for liking a yip
-// return 400 if missing parameter
-// return 500 if server issue
+
+/**
+ * The app.post('/yipper/likes') is a POST Endpoint that allows a user to like a yip.
+ * If the request is missing an id, it returns a 400 status code.
+ * If there's a server error, it returns a 500 status code.
+ * @param {string} req - Express request object.
+ * @param {string} res - Express response object.
+ */
 app.post('/yipper/likes', async(req, res) => {
   try {
     if (!req.body.id) {
@@ -94,9 +109,13 @@ app.post('/yipper/likes', async(req, res) => {
   }
 });
 
-// POST endpoint for creating a new yip
-// return 400 if missing parameter
-// return 500 if server issue
+/**
+ * The app.post('/yipper/new') is a POST Endpoint that allows a user to create a new yip.
+ * If the request is missing a name or a full (text and hashtag), it returns a 400 status code.
+ * If there's a server error, it returns a 500 status code.
+ * @param {string} req - Express request object.
+ * @param {string} res - Express response object.
+ */
 app.post('/yipper/new', async(req, res) => {
   try {
     if (!req.body.name || !req.body.full) {

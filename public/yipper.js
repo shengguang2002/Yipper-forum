@@ -1,12 +1,12 @@
 /*
- * Name: Hanyang Yu
- * Date: May 10, 2023
- * Section: CSE 154 AF
- * TA: Donovan Kong && Sonia Saitawdekar
- * This is the JS to implement the UI for the pokedex and two Pokemon cards.
- * A Pokedex is an encyclopedia (or album) of different Pokemon species, representing each
- * Pokemon as a small "sprite" image. Player can choose from the 3 default pokemon and fight
- * with others. There is a game system provided. Once they defeat a new pokemon, they can use it.
+ * Author: Hanyang Yu
+ * Creation Date: May 10, 2023
+ * Course: CSE 154 AF
+ * TA: Donovan Kong & Sonia Saitawdekar
+ *
+ * This JavaScript file is developed for the assignment focusing on creating both client side
+ * and server-side services for the web application 'Yipper'. 'Yipper' is a platform inspired
+ * by 'Twitter', exclusively for our beloved dogs, the superior household companions.
  */
 "use strict";
 
@@ -14,6 +14,9 @@
 
   window.addEventListener("load", init);
 
+  /**
+   * Initializer function for the event listeners.
+   */
   function init() {
     id('search-btn').addEventListener('click', searchBtnClicked);
     id('home-btn').addEventListener('click', homeBtnClicked);
@@ -73,10 +76,11 @@
     showView('new');
   }
 
-  /**
+   /**
    * Asynchronously handles the submission event for the new Yip form.
    * Sends a POST request with the new Yip data and updates the view.
    * Catches and handles any errors that occur during the fetch.
+   * @param {Event} event - The form submission event
    */
   async function newFormSubmitted(event) {
     const WAIT_LENGTH = 2000;
@@ -91,7 +95,6 @@
       let response = await fetch('/yipper/new', {method: 'POST', body: newYip});
       await statusCheck(response);
       let yip = await response.json();
-      console.log(yip);
       let child = createYipCard(yip);
       id('home').prepend(child);
       qs('#new form').querySelector('#name').value = '';
@@ -106,9 +109,10 @@
    * Asynchronously handles the click event in the home view.
    * Fetches the clicked user's Yips and updates the view.
    * Catches and handles any errors that occur during the fetch.
+   * @param {Event} event - The form submission event
    */
   async function homeViewClicked(event) {
-    if (!event.target.classList.contains('individual')) return;
+    if (!event.target.classList.contains('individual')) {return};
     try {
       setError(false);
       showView('user');
@@ -174,10 +178,24 @@
     card.classList.add('card');
     card.id = yipInfo.id;
     let userImage = document.createElement('img');
-    userImage.src = `img/${yipInfo.name.toLowerCase().split(' ').join('-')}.png`;
+    userImage.src = `img/${yipInfo.name.toLowerCase()
+      .split(' ')
+      .join('-')}.png`;
     card.appendChild(userImage);
     let yipDiv = addYipDiv(yipInfo);
     card.appendChild(yipDiv);
+    card = addMetaDataToCard(card, yipInfo);
+    return card;
+  }
+
+/**
+   * Adds meta data to a Yip card element.
+   * @param {HTMLElement} card - The Yip card element to which meta data will be added.
+   * @param {Object} yipInfo - The yip object that includes id, name, yip, hashtag, likes,
+   * and date.
+   * @returns {HTMLElement} - A DOM element representing a Yip card with meta data.
+   */
+  function addMetaDataToCard(card, yipInfo) {
     let metaDiv = document.createElement('div');
     metaDiv.classList.add('meta');
     let dateElement = document.createElement('p');
