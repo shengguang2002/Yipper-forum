@@ -8,7 +8,8 @@ This API is designed to serve Yips (tweets) for a Yipper (Twitter clone) web app
 
 **Returned Data Format**: JSON
 
-**Description:**  This endpoint returns a list of Yips. If a search query is provided, it returns Yips that match the search text.
+**Description:**  This endpoint returns a list of Yips. If a search query is provided, it
+ returns Yips that match the search text.
 
 
 **Example Request:**  http://localhost:8000/yipper/yips?search=hello
@@ -37,7 +38,8 @@ Possible 500 (server error) error
 
 **Returned Data Format**: JSON
 
-**Description:** This endpoint returns a list of Yips from the given user. If no Yips are found for the user, it will return an error.
+**Description:** This endpoint returns a list of Yips from the given user. If no Yips are
+ found for the user, it will return an error.
 
 
 **Example Request:**   http://localhost:8000/yipper/user/Alice
@@ -63,7 +65,8 @@ Possible 500 (server error) error
 
 **Returned Data Format**: Plain Text
 
-**Description:**  This endpoint increments the like count for a given Yip and returns the new like count. The Yip id must be provided in the request body.
+**Description:**  This endpoint increments the like count for a given Yip and returns the
+ new like count. The Yip id must be provided in the request body.
 
 
 **Example Request:**  POST to http://localhost:8000/yipper/likes with body { "id": 1 }
@@ -83,10 +86,12 @@ Possible 500 (server error) error
 
 **Returned Data Format**: JSON
 
-**Description:** This endpoint creates a new Yip with the provided user name and Yip text. The user name and full Yip (including hashtag) must be provided in the request body.
+**Description:** This endpoint creates a new Yip with the provided user name and Yip text.
+ The user name and full Yip (including hashtag) must be provided in the request body.
 
+**Example Request:**  POST to http://localhost:8000/yipper/new with body { "name": "Alice",
+ "full": "Hello again, world! #greetings" }
 
-**Example Request:**  POST to http://localhost:8000/yipper/new with body { "name": "Alice", "full": "Hello again, world! #greetings" }
 **Example Response:**
 {
   "id": 2,
