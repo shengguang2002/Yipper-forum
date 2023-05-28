@@ -9,10 +9,10 @@
  */
 
 'use strict';
-const express = require('express');
-const multer = require("multer");
-const sqlite3 = require('sqlite3');
-const sqlite = require('sqlite');
+const express = require('express'); // Express.js framework for building web applications
+const multer = require("multer"); // Middleware for handling multipart/form-data
+const sqlite3 = require('sqlite3'); // SQLite database library
+const sqlite = require('sqlite'); // SQLite database driver
 const app = express();
 
 // Middleware setup
@@ -49,9 +49,15 @@ app.get('/yipper/yips', async (req, res) => {
     let db = await getDBConnection();
     let query;
     if (req.query.search) {
-      query = `SELECT id FROM yips WHERE yip LIKE '%${req.query.search}%' ORDER BY id`;
+      query = `SELECT id
+      FROM yips
+      WHERE yip
+      LIKE '%${req.query.search}%'
+      ORDER BY id`;
     } else {
-      query = `SELECT id, name, yip, hashtag, likes, date FROM yips ORDER BY DATETIME(date) DESC`;
+      query = `SELECT id, name, yip, hashtag, likes, date
+      FROM yips
+      ORDER BY DATETIME(date) DESC`;
     }
     let row = await db.all(query);
     res.type('json').json({"yips": row});
@@ -72,7 +78,9 @@ app.get('/yipper/user/:user', async (req, res) => {
     let user = req.params.user;
     let db = await getDBConnection();
     let query = `SELECT name, yip, hashtag, date
-    FROM yips WHERE name = '${user}' ORDER BY DATETIME(date) DESC`;
+    FROM yips
+    WHERE name = '${user}'
+    ORDER BY DATETIME(date) DESC`;
     let result = await db.all(query);
     if (result.length === 0) {
       res.status(ERROR_CODE).send('User does not exist.');
@@ -99,9 +107,13 @@ app.post('/yipper/likes', async (req, res) => {
     }
     let id = req.body.id;
     let db = await getDBConnection();
-    let sql = `UPDATE yips SET likes = likes + 1 WHERE id = ?`;
+    let sql = `UPDATE yips
+    SET likes = likes + 1
+    WHERE id = ?`;
     await db.run(sql, [id]);
-    let row = await db.get(`SELECT * FROM yips WHERE id = ?`, id);
+    let row = await db.get(`SELECT *
+    FROM yips
+    WHERE id = ?`, id);
     res.type('text').send(String(row.likes));
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
@@ -127,7 +139,9 @@ app.post('/yipper/new', async (req, res) => {
     VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`;
     let results = await db.run(sql, [req.body.name, yip, hashtag]);
     let id = results.lastID;
-    let row = await db.get(`SELECT * FROM yips WHERE id = ?`, id);
+    let row = await db.get(`SELECT *
+    FROM yips
+    WHERE id = ?`, id);
     res.type('json').json(row);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
