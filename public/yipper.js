@@ -1,8 +1,6 @@
 /*
  * Author: Hanyang Yu
  * Creation Date: May 10, 2023
- * Course: CSE 154 AF
- * TA: Donovan Kong & Sonia Saitawdekar
  *
  * This JavaScript file is developed for the assignment focusing on creating both client side
  * and server-side services for the web application 'Yipper'. 'Yipper' is a platform inspired
@@ -26,6 +24,8 @@
     id('search-term').addEventListener('input', searchTermInput);
     loadYips();
   }
+
+
 
   /**
    * Asynchronously handles the click event for the search button.
